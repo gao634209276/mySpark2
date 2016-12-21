@@ -1,0 +1,51 @@
+Spark2.0 中引入了SparkSession的概念，它为用户提供了一个统一的切入点来使用Spark的各项功能，
+用户不但可以使用DataFrame和Dataset的各种API，学习Spark的难度也会大大降低。
+创建SparkSession
+	在2.0版本之前，使用Spark必须先创建SparkConf和SparkContext，代码如下：
+	See :SparkContext.scala
+	不过在Spark2.0中只要创建一个SparkSession就够了，SparkConf、SparkContext和SQLContext都已经被封装在SparkSession当中。
+	下面的代码创建了一个SparkSession对象并设置了一些参数。
+	这里使用了生成器模式，只有此“spark”对象不存在时才会创建一个新对象。
+
+		val warehouseLocation = "file:${system:user.dir}/spark-warehouse"
+		val spark = SparkSession
+		   .builder()
+		   .appName("SparkSessionZipsExample")
+		   .config("spark.sql.warehouse.dir", warehouseLocation)
+		   .enableHiveSupport()
+		   .getOrCreate()
+
+		执行完上面的代码就可以使用spark对象了。
+
+设置运行参数
+	//set new runtime options
+	spark.conf.set("spark.sql.shuffle.partitions", 6)
+	spark.conf.set("spark.executor.memory", "2g")
+	//get all settings
+	val configMap:Map[String, String] = spark.conf.getAll()
+
+	也可以使用Scala的迭代器来读取configMap中的数据。
+
+读取元数据
+	如果需要读取元数据（catalog），可以通过SparkSession来获取。
+		spark.catalog.listDatabases.show(false)
+		spark.catalog.listTables.show(false)
+	这里返回的都是Dataset，所以可以根据需要再使用Dataset API来读取。
+
+创建Dataset和Dataframe
+	通过SparkSession来创建Dataset和Dataframe有多种方法。
+	其中最简单的就是使用spark.range方法来生成Dataset，在摸索Dataset API的时候这个办法尤其有用。
+
+
+
+
+
+
+
+
+
+
+
+
+
+

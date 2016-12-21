@@ -1,0 +1,2 @@
+mvn archetype:generate -DarchetypeGroupId=org.scala-tools.archetypes -DarchetypeArtifactId=scala-archetype-simple  -DremoteRepositories=http://scala-tools.org/repo-releases
+mvn clean scala:compile compile package

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="mySpark2:jar">
+    <output-path>$USER_HOME$/Desktop/work</output-path>
+    <root id="archive" name="mySpark2.jar">
+      <element id="module-output" name="mySpark2" />
+    </root>
+  </artifact>
+</component>

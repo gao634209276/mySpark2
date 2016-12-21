@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration> 
+	<property>
+		<name>dfs.replication</name>
+		<value>1</value>
+	</property>
+	<property>
+		 <name>dfs.permissions</name>
+		<value>false</value>
+	</property>
+	<property>
+		<name>dfs.datanode.data.dir</name>
+		<value>file:///disk0/var/hdfs/data,file:///disk1/var/hdfs/data</value>
+		<description>使用逗号分隔多个datanode路径</description>
+	</property>
+	<property>
+		<name>dfs.namenode.name.dir</name>
+		<value>file:///disk0/var/hdfs/name</value>
+	</property>
+	<property>
+		 <name>dfs.datanode.max.xcievers</name>
+		 <value>4096</value>
+	</property>
+	<property>
+		 <name>dfs.webhdfs.enabled</name>
+		 <value>true</value>
+	</property>
+       <!-- Namenode HA settings -->
+
+        <property>
+          <name>dfs.nameservices</name>
+          <value>yh-hdp</value>
+        </property>
+        <property>
+          <name>dfs.ha.namenodes.yh-hdp</name>
+          <value>nn1,nn2</value>
+        </property>
+        <property>
+          <name>dfs.namenode.rpc-address.yh-hdp.nn1</name>
+          <value>bj-ecs-jm429-i-e2-1-bl460c-10-null-10:8020</value>
+        </property>
+        <property>
+          <name>dfs.namenode.rpc-address.yh-hdp.nn2</name>
+          <value>bj-ecs-jm429-I-e2-1-bl460c-9-null-9:8020</value>
+        </property>
+        <property>
+          <name>dfs.namenode.http-address.yh-hdp.nn1</name>
+          <value>bj-ecs-jm429-i-e2-1-bl460c-10-null-10:50070</value>
+        </property>
+        <property>
+          <name>dfs.namenode.http-address.yh-hdp.nn2</name>
+          <value>bj-ecs-jm429-I-e2-1-bl460c-9-null-9:50070</value>
+        </property>
+
+         <property>
+          <name>dfs.namenode.shared.edits.dir</name>
+          <value>qjournal://bj-ecs-jm429-I-e2-1-bl460c-9-null-9:8485;bj-ecs-jm429-i-e2-1-bl460c-10-null-10:8485/yh-hdp</value>
+        </property>
+        <property>  
+          <name>dfs.journalnode.edits.dir</name>  
+          <value>/disk0/var/journal</value>  
+       </property> 
+	<property>
+	  <name>dfs.client.failover.proxy.provider.yh-hdp</name>
+	  <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+	</property>
+	<property>
+	  <name>dfs.ha.fencing.methods</name>
+	  <value>sshfence</value>
+	</property>
+	<property>
+	  <name>dfs.ha.fencing.ssh.private-key-files</name>
+	  <value>/home/sinova/.ssh/id_rsa</value>
+	</property>
+	<property>
+	<name>dfs.ha.automatic-failover.enabled</name>
+	<value>true</value>
+	</property>  
+</configuration>
