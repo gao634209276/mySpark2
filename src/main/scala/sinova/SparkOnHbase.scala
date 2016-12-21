@@ -15,48 +15,48 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object SparkOnHbase {
 
 	case class hbase(id: String, bz: String, detailid: String,
-									 creator: String, create_time: String,
-									 province_code: String, status: String,
-									 order_number: String,
-									 dataprovince: String, citycode: String, nettype: String,
-									 paymenttype: String, sequenceid: String,
-									 publishstatus: String, releasechannel: String,
-									 updateload: String, starttimes: String, endtimes: String
-									)
+	                 creator: String, create_time: String,
+	                 province_code: String, status: String,
+	                 order_number: String,
+	                 dataprovince: String, citycode: String, nettype: String,
+	                 paymenttype: String, sequenceid: String,
+	                 publishstatus: String, releasechannel: String,
+	                 updateload: String, starttimes: String, endtimes: String
+	                )
 
 	def main(args: Array[String]) {
 		Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
 		val spark = SparkSession.builder()
-			.appName("HbaseJoin")
-			.enableHiveSupport()
-			.master("yarn")
-			.getOrCreate()
+				.appName("HbaseJoin")
+				.enableHiveSupport()
+				.master("yarn")
+				.getOrCreate()
 		val sc = spark.sparkContext
 
 		/**
-			* +-------------------------------+-----------------+------------+------------+--------------+
-			* |          TABLE_NAME           |   COLUMN_NAME   | DATA_TYPE  | TYPE_NAME  | COLUMN_SIZE  |
-			* +-------------------------------+-----------------+------------+------------+--------------+
-			* | tmp_twelve_flow_package_base  | bz              | 1          | CHAR       | 4            |
-			* | tmp_twelve_flow_package_base  | id              | 12         | VARCHAR    | 50           |
-			* | tmp_twelve_flow_package_base  | detailid        | 12         | VARCHAR    | 50           |
-			* | tmp_twelve_flow_package_base  | creator         | 12         | VARCHAR    | 30           |
-			* | tmp_twelve_flow_package_base  | create_time     | 91         | DATE       | null         |
-			* | tmp_twelve_flow_package_base  | province_code   | -6         | TINYINT    | null         |
-			* | tmp_twelve_flow_package_base  | status          | -6         | TINYINT    | null         |
-			* | tmp_twelve_flow_package_base  | order_number    | 4          | INTEGER    | null         |
-			* | tmp_twelve_flow_package_base  | dataprovince    | -6         | TINYINT    | null         |
-			* | tmp_twelve_flow_package_base  | citycode        | -6         | TINYINT    | null         |
-			* | tmp_twelve_flow_package_base  | nettype         | -6         | TINYINT    | null         |
-			* | tmp_twelve_flow_package_base  | paymenttype     | -6         | TINYINT    | null         |
-			* | tmp_twelve_flow_package_base  | sequenceid      | 1          | CHAR       | 20           |
-			* | tmp_twelve_flow_package_base  | publishstatus   | -6         | TINYINT    | null         |
-			* | tmp_twelve_flow_package_base  | releasechannel  | 4          | INTEGER    | null         |
-			* | tmp_twelve_flow_package_base  | updateload      | 1          | CHAR       | 14           |
-			* | tmp_twelve_flow_package_base  | starttimes      | 91         | DATE       | null         |
-			* | tmp_twelve_flow_package_base  | endtimes        | 91         | DATE       | null         |
-			* +-------------------------------+-----------------+------------+------------+--------------+
-			*/
+		  * +-------------------------------+-----------------+------------+------------+--------------+
+		  * |          TABLE_NAME           |   COLUMN_NAME   | DATA_TYPE  | TYPE_NAME  | COLUMN_SIZE  |
+		  * +-------------------------------+-----------------+------------+------------+--------------+
+		  * | tmp_twelve_flow_package_base  | bz              | 1          | CHAR       | 4            |
+		  * | tmp_twelve_flow_package_base  | id              | 12         | VARCHAR    | 50           |
+		  * | tmp_twelve_flow_package_base  | detailid        | 12         | VARCHAR    | 50           |
+		  * | tmp_twelve_flow_package_base  | creator         | 12         | VARCHAR    | 30           |
+		  * | tmp_twelve_flow_package_base  | create_time     | 91         | DATE       | null         |
+		  * | tmp_twelve_flow_package_base  | province_code   | -6         | TINYINT    | null         |
+		  * | tmp_twelve_flow_package_base  | status          | -6         | TINYINT    | null         |
+		  * | tmp_twelve_flow_package_base  | order_number    | 4          | INTEGER    | null         |
+		  * | tmp_twelve_flow_package_base  | dataprovince    | -6         | TINYINT    | null         |
+		  * | tmp_twelve_flow_package_base  | citycode        | -6         | TINYINT    | null         |
+		  * | tmp_twelve_flow_package_base  | nettype         | -6         | TINYINT    | null         |
+		  * | tmp_twelve_flow_package_base  | paymenttype     | -6         | TINYINT    | null         |
+		  * | tmp_twelve_flow_package_base  | sequenceid      | 1          | CHAR       | 20           |
+		  * | tmp_twelve_flow_package_base  | publishstatus   | -6         | TINYINT    | null         |
+		  * | tmp_twelve_flow_package_base  | releasechannel  | 4          | INTEGER    | null         |
+		  * | tmp_twelve_flow_package_base  | updateload      | 1          | CHAR       | 14           |
+		  * | tmp_twelve_flow_package_base  | starttimes      | 91         | DATE       | null         |
+		  * | tmp_twelve_flow_package_base  | endtimes        | 91         | DATE       | null         |
+		  * +-------------------------------+-----------------+------------+------------+--------------+
+		  */
 		val hbaseRDD = getTable("tmp_twelve_flow_package_base", sc)
 		//		val tableRDD = hbaseRDD.map(tuple => {
 		//			val result = tuple._2
@@ -237,10 +237,10 @@ object SparkOnHbase {
 
 		val rdd = df.rdd.map { row => {
 			/**
-				* 一个Put对象就是一行记录，在构造方法中指定主键
-				* 所有插入的数据必须用org.apache.hadoop.hbase.util.Bytes.toBytes方法转换
-				* Put.add方法接收三个参数：列族，列名，数据
-				*/
+			  * 一个Put对象就是一行记录，在构造方法中指定主键
+			  * 所有插入的数据必须用org.apache.hadoop.hbase.util.Bytes.toBytes方法转换
+			  * Put.add方法接收三个参数：列族，列名，数据
+			  */
 			val put = new Put(Bytes.toBytes(row.getInt(1)))
 			put.add(Bytes.toBytes("cf"), Bytes.toBytes("name"), Bytes.toBytes(row.getString(2)))
 			put.add(Bytes.toBytes("cf"), Bytes.toBytes("age"), Bytes.toBytes(row.getInt(3)))

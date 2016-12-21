@@ -1,8 +1,7 @@
 package hbase
 
 /**
-	* Created by 小小科学家 on 2016/12/21.
-	*/
+  */
 object ScalaTest {
 	def main(args: Array[String]) {
 		val colArray: Array[String] = Array("ID",

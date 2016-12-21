@@ -10,7 +10,7 @@ object SparkContextWC {
 		val conf = new SparkConf().setAppName("test").setMaster("local")
 
 		val sc = new SparkContext(conf)
-		sc.textFile("src/main/resources/people.txt")
+		sc.textFile("src/main/data/people.txt")
 			.flatMap(_.split(" "))
 			.map((_, 1))
 			.reduceByKey(_ + _)
