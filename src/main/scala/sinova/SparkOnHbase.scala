@@ -169,16 +169,16 @@ object SparkOnHbase {
 		// DF to sql
 		//hbaseDF.createOrReplaceTempView("hbaseTable")
 		//hiveDF.createOrReplaceTempView("hiveTable")
-		//import spark.sql
+		import spark.sql
 		//sql("CREATE TEMPORARY FUNCTION str_to_date AS 'com.nexr.platform.hive.udf.UDFStrToDate'")
-		/*		val sqlDF = sql("select distinct'1004'," +
+				val sqlDF = sql("select distinct'1004'," +
 					"t1.DATAPROVINCE,t1.CITYCODE,t1.NETTYPE,t1.PAYMENTTYPE,t1.PUBLISHSTATUS,t1.RELEASECHANNEL," +
 					"t1.STARTTIMES,t1.ENDTIMES," +
 					"t2.PRODUCTNAME,t2.PRODUCTCODE,t2.PACKAGECODE,t2.PACKAGENAME,t2.FLOWKINDS,t2.EFFICWAYS,t2.TARIFFCODE" +
 					" from hbaseTable t1" +
 					" join hiveTable t2" +
 					" on (t1.ID=t2.ID)")
-				sqlDF.show()*/
+				sqlDF.show()
 
 		// RDD to DS,于DF类似
 		// 通过case class转换

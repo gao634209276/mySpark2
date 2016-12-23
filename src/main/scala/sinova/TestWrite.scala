@@ -1,32 +1,30 @@
 package sinova
 
-import org.apache.hadoop.fs.Path
-import org.apache.hadoop.hbase.client.{HBaseAdmin, HTable, Put, Result}
+import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
-import org.apache.hadoop.hbase.mapreduce.{HFileOutputFormat2, LoadIncrementalHFiles, TableOutputFormat}
-import org.apache.hadoop.hbase.protobuf.generated.CellProtos.KeyValue
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.hbase.{HColumnDescriptor, HTableDescriptor, TableName}
+import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor, TableName}
 import org.apache.hadoop.mapreduce.Job
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SparkSession
 
 /**
-  * Read form hive Write to Hbase
-  */
+	* Read form hive Write to Hbase
+	*/
 object TestWrite {
 
 
 	def main(args: Array[String]) {
 		Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
 		val spark = SparkSession.builder()
-				.master("yarn")
-				.appName("HbaseRead")
-				.config("hbase.zookeeper.quorum", "localhost")
-				.config("hbase.zookeeper.property.clientPort", "2181")
-				.enableHiveSupport()
-				.getOrCreate()
+			.master("yarn")
+			.appName("HbaseRead")
+			.config("hbase.zookeeper.quorum", "localhost")
+			.config("hbase.zookeeper.property.clientPort", "2181")
+			.enableHiveSupport()
+			.getOrCreate()
 		val sc = spark.sparkContext
 
 		import spark.sql
@@ -48,7 +46,7 @@ object TestWrite {
 			"remark1", "remark2", "remark3", "remark4", "remark5",
 			"bizend_time", "biz_hostip", "biz_process", "dt")
 
-		/*// 1
+		// 1
 		sc.hadoopConfiguration.set(TableOutputFormat.OUTPUT_TABLE, "hiveTest")
 		val job = Job.getInstance(sc.hadoopConfiguration)
 		job.setOutputKeyClass(classOf[ImmutableBytesWritable])
@@ -61,20 +59,29 @@ object TestWrite {
 			}
 			(new ImmutableBytesWritable, put)
 		})
-		hbaseRDD.saveAsNewAPIHadoopDataset(job.getConfiguration)*/
+		hbaseRDD.saveAsNewAPIHadoopDataset(job.getConfiguration)
 
 
-		/*// 2
-		sc.hadoopConfiguration.set("hbase.defaults.for.version.skip", "true")
-		val myTable = new HTable(sc.hadoopConfiguration, TableName.valueOf("hiveTest"))
-		//1:自动提交关闭，如果不关闭，每写一条数据都会进行提交，是导入数据较慢的做主要因素。
-		myTable.setAutoFlush(false, false)
-		//2:缓存大小，当缓存大于设置值时，hbase会自动提交。此处可自己尝试大小，一般对大数据量，设置为5M即可，本文设置为3M。
-		myTable.setWriteBufferSize(3 * 1024 * 1024)
+		// 2
 		// write
-		hiveDF.rdd.foreachPartition(row => {
+		//val myConf = spark.sparkContext.hadoopConfiguration
+		//myConf.set("hbase.defaults.for.version.skip", "true")
+		hiveDF.rdd.foreachPartition(iterator => {
 
-			row.foreach(row => {
+			val myConf = HBaseConfiguration.create()
+			myConf.set("hbase.zookeeper.quorum", "localhost")
+			myConf.set("hbase.zookeeper.property.clientPort", "2181")
+			myConf.set("hbase.defaults.for.version.skip", "true")
+			// partition级别创建多个HTable客户端用于写操作，提高写数据的吞吐量
+			//val myTable = new HTable(myConf, TableName.valueOf("hiveTest"))
+			val conn = HConnectionManager.createConnection(myConf)
+			val myTable = conn.getTable(TableName.valueOf("hiveTest"))
+			//1:自动提交关闭，如果不关闭，每写一条数据都会进行提交，是导入数据较慢的做主要因素。
+			myTable.setAutoFlush(false, false)
+			//2:缓存大小，当缓存大于设置值时，hbase会自动提交。此处可自己尝试大小，一般对大数据量，设置为5M即可，本文设置为3M。
+			myTable.setWriteBufferSize(5 * 1024 * 1024)
+
+			iterator.foreach(row => {
 				println(row(0) + ":::" + row(1))
 				val p = new Put(Bytes.toBytes(row.getString(0)))
 				for (i <- 1 until colArray.length) {
@@ -83,8 +90,11 @@ object TestWrite {
 				myTable.put(p)
 			})
 			//3:每一个分片结束后都进行flushCommits()，如果不执行，当hbase最后缓存小于上面设定值时，不会进行提交，导致数据丢失。
+			//在close方法中自动调用myTable.flushCommits()]
 			myTable.flushCommits()
-		})*/
+			myTable.close()
+			conn.close()
+		})
 
 		/*// 3
 		sc.hadoopConfiguration.set(TableOutputFormat.OUTPUT_TABLE, "hiveTest")
