@@ -1,0 +1,26 @@
+http://lxw1234.com/archives/2015/05/224.htm
+一般情况下，Redis Client端发出一个请求后，通常会阻塞并等待Redis服务端处理，
+Redis服务端处理完后请求命令后会将结果通过响应报文返回给Client。
+这有点类似于HBase的Scan，通常是Client端获取每一条记录都是一次RPC调用服务端。
+在Redis中，有没有类似HBase Scanner Caching的东西呢，一次请求，返回多条记录呢？
+有，这就是Pipline。官方介绍 http://redis.io/topics/pipelining
+
+通过pipeline方式当有大批量的操作时候，我们可以节省很多原来浪费在网络延迟的时间，
+需要注意到是用pipeline方式打包命令发送，redis必须在处理完所有命令前先缓存起所有命令的处理结果。
+打包的命令越多，缓存消耗内存也越多。所以并不是打包的命令越多越好。
+使用Pipeline在对Redis批量读写的时候，性能上有非常大的提升。
+
+pipeline机制
+
+主要的两个底层函数：
+1.redisvAppendCommand将命令拷贝到context的obuf里
+2.redisGetReply：
+1）从reply队列里面返回最前面的reply，如果队列为空，继续后面的操作
+2）如果发现obuf中有数据没有发送，那么发送cmd
+3）等待回包（server会把cmd中所有的处理做完，然后回包，appand过几次，server就会返回几个reply）；收到回包后，redisGetReply里面解析回包为reply（可能为多个，具体数量跟appand次数相同）；然后返回最前面的reply
+ 实现剖析：
+1.非pipeline模式直接调用redisCommand也是变成redisvAppendCommand + __redisBlockForReply（redisGetReply）
+2.pipeline模式就是N次redisvAppendCommand  + N次redisGetReply
+症结所在：
+redisGetReply是纯粹的client行为，server并不知道。如果调用的appand次数与getreply次数不匹配，会引起混乱。
+如果多调用了redisGetReply，那么就会直接block

@@ -8,11 +8,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class RedisPipeline {
 	public static void main(String[] args) {
-		Jedis redis = new Jedis("127.0.0.1", 6379, 400000);
+		Jedis redis = new Jedis("10.40.33.11", 6379, 400000);
+		test(redis);
+	}
+
+	private static void test(Jedis redis){
+		redis.select(1);
+		redis.asking();
+		redis.close();
+		redis.disconnect();
+	}
+	private static void testhmset(Jedis redis) {
 		Map<String, String> data = new HashMap<String, String>();
 		redis.select(8);
 		redis.flushDB();
@@ -29,36 +37,50 @@ public class RedisPipeline {
 		System.out.println("hmset without pipeline used [" + (end - start) / 1000 + "] seconds ..");
 		redis.select(8);
 		redis.flushDB();
+		redis.disconnect();
+	}
 
+	private static void hmget(Jedis redis) {
+		//hmget
+		Set<String> keys = redis.keys("*");
+		//直接使用Jedis hgetall
+		long start = System.currentTimeMillis();
+		Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
+		for (String key : keys) {
+			result.put(key, redis.hgetAll(key));
+		}
+		long end = System.currentTimeMillis();
+		System.out.println("result size:[" + result.size() + "] ..");
+		System.out.println("hgetAll without pipeline used [" + (end - start) / 1000 + "] seconds ..");
+		redis.disconnect();
+	}
+
+
+	private static void pipelineHmset(Jedis redis) {
 		//使用pipeline hmset
+		Map<String, String> data = new HashMap<String, String>();
 		Pipeline p = redis.pipelined();
-		start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 		for (int i = 0; i < 10000; i++) {
 			data.clear();
 			data.put("k_" + i, "v_" + i);
 			p.hmset("key_" + i, data);
 		}
 		p.sync();
-		end = System.currentTimeMillis();
+		long end = System.currentTimeMillis();
 		System.out.println("dbsize:[" + redis.dbSize() + "] .. ");
 		System.out.println("hmset with pipeline used [" + (end - start) / 1000 + "] seconds ..");
+		redis.disconnect();
+	}
 
-		//hmget
+	private static void pipelineHmget(Jedis redis) {
+		Pipeline p = redis.pipelined();
 		Set<String> keys = redis.keys("*");
-		//直接使用Jedis hgetall
-		start = System.currentTimeMillis();
-		Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
-		for (String key : keys) {
-			result.put(key, redis.hgetAll(key));
-		}
-		end = System.currentTimeMillis();
-		System.out.println("result size:[" + result.size() + "] ..");
-		System.out.println("hgetAll without pipeline used [" + (end - start) / 1000 + "] seconds ..");
-
 		//使用pipeline hgetall
 		Map<String, Response<Map<String, String>>> responses = new HashMap<String, Response<Map<String, String>>>(keys.size());
+		Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 		result.clear();
-		start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 		for (String key : keys) {
 			responses.put(key, p.hgetAll(key));
 		}
@@ -66,11 +88,28 @@ public class RedisPipeline {
 		for (String k : responses.keySet()) {
 			result.put(k, responses.get(k).get());
 		}
-		end = System.currentTimeMillis();
+		long end = System.currentTimeMillis();
 		System.out.println("result size:[" + result.size() + "] ..");
 		System.out.println("hgetAll with pipeline used [" + (end - start) / 1000 + "] seconds ..");
-
 		redis.disconnect();
 
+	}
+
+	private static void usePipeline(int count) {
+		Jedis jr = null;
+		try {
+			jr = new Jedis("10.40.33.11", 6379);
+			Pipeline pl = jr.pipelined();
+			for (int i = 0; i < count; i++) {
+				pl.incr("testKey2");
+			}
+			pl.sync();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (jr != null) {
+				jr.disconnect();
+			}
+		}
 	}
 }

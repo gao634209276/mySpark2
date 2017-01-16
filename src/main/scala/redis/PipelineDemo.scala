@@ -13,10 +13,7 @@ object PipelineDemo {
     val redisClient = new Jedis(redisHost, redisPort)
     // 如果有密码，需要进行密码验证
     redisClient.auth(redisPassword)
-
-
   }
-
 
   //没有使用Redis的pipeline，当数据较少的时候，可以用来使用
   def testNormal(redisClient: Jedis): Unit = {
@@ -26,8 +23,6 @@ object PipelineDemo {
       println(redisClient.get(key))
     }
   }
-
-
   //使用pipeline批量读取数据之一（简化版）
   def testPipeline(redisClient: Jedis): Unit = {
     /**
