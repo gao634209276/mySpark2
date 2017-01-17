@@ -92,21 +92,6 @@
 			<version>2.6.2</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.hbase</groupId>
-			<artifactId>hbase-client</artifactId>
-			<version>${hbase.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hbase</groupId>
-			<artifactId>hbase-common</artifactId>
-			<version>${hbase.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hbase</groupId>
-			<artifactId>hbase-server</artifactId>
-			<version>${hbase.version}</version>
-		</dependency>
 		<!--		<dependency>
 					<groupId>org.apache.phoenix</groupId>
 					<artifactId>phoenix-spark</artifactId>
@@ -130,6 +115,23 @@
 					<version>${scala.version}</version>
 				</dependency>-->
 
+
+
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-client</artifactId>
+			<version>${hbase.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-common</artifactId>
+			<version>${hbase.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-server</artifactId>
+			<version>${hbase.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
