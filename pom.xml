@@ -149,6 +149,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>mySpark2</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
