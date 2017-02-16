@@ -1,0 +1,6 @@
+123 hello
+345 world
+22  hadoop
+56  spark
+34  flume
+657 kafka

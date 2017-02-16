@@ -1,5 +1,6 @@
 package spark
 
+import org.apache.spark.util.LongAccumulator
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -20,6 +21,7 @@ object broadCastTest {
 
 		//accumulator
 		var accumulator = sc.accumulator(2)
+		new  LongAccumulator();
 		//错误
 		val RDD2 = sc.parallelize(List(1, 1, 1)).map { x =>
 			if (x < 3) {

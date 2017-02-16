@@ -1,0 +1,5 @@
+this is just a test
+hello wordcount ! hello world ! hello spark !
+spark is good !
+1 1 1 2 2 2 2 3 3 4
+你好 中国 你好 世界
